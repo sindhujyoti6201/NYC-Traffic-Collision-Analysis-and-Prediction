@@ -1,0 +1,24 @@
+[project]
+name = "nyc-traffic-collision-analysis-and-prediction"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Sindhujyoti Dutta", email = "sd6201@nyu.edu" }
+]
+dependencies = []
+readme = "README.md"
+requires-python = ">= 3.8"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nyc_traffic_collision_analysis_and_prediction"]
