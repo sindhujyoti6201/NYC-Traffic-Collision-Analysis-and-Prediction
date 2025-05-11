@@ -1,36 +1,48 @@
 version: '3.8'
 
 services:
-  mongo:
-    image: mongo:latest
-    container_name: mongo_db
+
+  #### PRODUCER - START ####
+
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    container_name: zookeeper
     ports:
-      - "27017:27017"
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: bitnami/kafka:3.4.0  # ✅ Compatible with Zookeeper
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_ENABLE_KRAFT=no
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=yes
     volumes:
-      - mongo_data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: extracted_data
+      - kafka_data:/bitnami/kafka
 
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo_express_ui
+  producer:
+    build:
+      context: ./src/nyc_traffic_collision_analysis_and_prediction/data-collection/producers
+    container_name: producer
+    depends_on:
+      - kafka
     ports:
-      - "8081:8081"
+      - "5000:5000"
     environment:
-      - ME_CONFIG_MONGODB_SERVER=mongo
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin
-    depends_on:
-      - mongo
-
-  extractor:
-    build: ./extractor
-    container_name: data_extractor
-    depends_on:
-      - mongo
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/extracted_data
-    command: ["python", "extract.py"]
+      - BOOTSTRAP_SERVERS=kafka:9092
 
 volumes:
-  mongo_data:
+  kafka_data:
+
+  ### PRODUCER - END ###
