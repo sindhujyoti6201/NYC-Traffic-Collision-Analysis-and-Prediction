@@ -65,6 +65,8 @@ def consume_speeds():
             print(f"❌ Speed insert error: {e}")
 
 if __name__ == "__main__":
+    print("Starting consumers...")
+    # Start the consumers in separate threads
     Thread(target=consume_collisions, daemon=True).start()
     Thread(target=consume_speeds,    daemon=True).start()
     print("✅ Consumers are up and running.")
