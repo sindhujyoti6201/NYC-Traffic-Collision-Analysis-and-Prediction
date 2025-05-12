@@ -76,6 +76,18 @@ services:
     command: ["zookeeper:2181", "kafka:9092", "DEV"]
     restart: unless-stopped
 
+
+  # App server
+  spark-flask-app:
+    build:
+      context: ./src/nyc_traffic_collision_analysis_and_prediction/app-server/
+    ports:
+      - "5002:5002"
+    depends_on:
+      - mongodb
+    restart: unless-stopped
+
+
 volumes:
   mongo_data:
   # kafka_internal_data:
