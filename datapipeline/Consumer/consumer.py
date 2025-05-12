@@ -1,4 +1,4 @@
-# consumer/consumer_test.py
+# consumer/consumer.py
 
 import os
 import json
@@ -25,26 +25,27 @@ collisions_col = mongo.collisions_ts
 speeds_col     = mongo.traffic_speeds
 
 # ─── Helper: retrying consumer factory ─────────────────────────
-def make_consumer(topic, group, offset):
+def make_consumer(topic, group_id, offset_reset):
     while True:
         try:
             c = KafkaConsumer(
                 topic,
                 bootstrap_servers=[KAFKA_ADDR],
-                group_id=group,
-                auto_offset_reset=offset,
+                group_id=group_id,            
+                auto_offset_reset=offset_reset,
                 enable_auto_commit=True,
                 value_deserializer=lambda m: json.loads(m.decode("utf-8"))
             )
-            print(f"✅ {group} connected to Kafka, subscribed to {topic}")
+            print(f"✅ {group_id} connected to Kafka, subscribed to {topic}")
             return c
         except NoBrokersAvailable:
-            print(f"⏳ {group} cannot connect to Kafka at {KAFKA_ADDR}, retrying in 5s…")
+            print(f"⏳ {group_id} cannot connect to Kafka at {KAFKA_ADDR}, retrying in 5s…")
             time.sleep(5)
 
-# ─── Collision consumer (backfill) ────────────────────────────
+# ─── Collision consumer (historical + incremental) ─────────────
 def consume_collisions():
-    cons = make_consumer(COL_TOPIC, "collision-consumer", "earliest")
+    # Read from the very beginning on first ever run; then only new messages
+    cons = make_consumer(COL_TOPIC, group_id="collision-consumer", offset_reset="earliest")
     for msg in cons:
         try:
             collisions_col.insert_one(msg.value)
@@ -52,9 +53,10 @@ def consume_collisions():
         except Exception as e:
             print(f"❌ Collision insert error: {e}")
 
-# ─── Speeds consumer (live‑only) ───────────────────────────────
+# ─── Speeds consumer (historical + incremental) ────────────────
 def consume_speeds():
-    cons = make_consumer(SPD_TOPIC, "speed-live-checker", "latest")
+    # Now backfill all speeds as well, then pick up new ones
+    cons = make_consumer(SPD_TOPIC, group_id="speed-consumer", offset_reset="earliest")
     for msg in cons:
         try:
             speeds_col.insert_one(msg.value)
