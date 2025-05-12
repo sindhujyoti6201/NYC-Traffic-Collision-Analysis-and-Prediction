@@ -222,6 +222,7 @@ def start_scheduler():
     ), daemon=True).start()
 
 if __name__ == "__main__":
+    print("Starting Kafka producer...")
     producer = make_producer(KAFKA_ADDR)
     start_scheduler()
     app.run(host="0.0.0.0", port=5000)
