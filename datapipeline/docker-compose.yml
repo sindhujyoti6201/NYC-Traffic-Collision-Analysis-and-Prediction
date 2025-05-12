@@ -27,6 +27,7 @@ services:
       - "8081:8081"
     environment:
       ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH: "false"
     depends_on:
       - mongodb
 
@@ -52,3 +53,14 @@ services:
     depends_on:
       - kafka
       - mongodb
+  volumes:
+    mongo_data:
+      driver: local
+    kafka_data:
+      driver: local
+    zookeeper_data:
+      driver: local
+    producer_data:
+      driver: local
+    consumer_data:
+      driver: local
