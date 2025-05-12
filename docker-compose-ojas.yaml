@@ -1,0 +1,53 @@
+# version: '3.8'
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: extracted_data
+  spark:
+    image: bitnami/spark:latest
+    container_name: spark
+    depends_on:
+      - mongo
+    environment:
+      - SPARK_MODE=master
+      - SPARK_EXTRA_CLASSPATH=/opt/spark/jars/mongo-spark-connector-shaded.jar
+    ports:
+      - "4040:4040"
+    volumes:
+      - ./src/nyc_traffic_collision_analysis_and_prediction/model_training:/app
+      - ./spark_jars/mongo-spark-connector-shaded.jar:/opt/spark/jars/mongo-spark-connector-shaded.jar
+    command: >
+      bash -c "
+      sleep 10 &&
+      /opt/bitnami/spark/bin/spark-submit /app/app.py
+      "
+  mongo-express:
+    image: mongo-express:latest
+    container_name: mongo_express_ui
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongo
+
+#   extractor:
+#     build: ./extractor
+#     container_name: data_extractor
+#     depends_on:
+#       - mongo
+#     environment:
+#       - MONGO_URI=mongodb://mongo:27017/extracted_data
+#     command: ["python", "extract.py"]
+
+volumes:
+  mongo_data:
