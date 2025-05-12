@@ -1,5 +1,0 @@
-sodapy
-kafka-python
-python-dotenv
-pymongo
-flask
