@@ -1,15 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Button, CardHeader, CircularProgress } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, CardHeader, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress, Chip } from '@mui/material';
 import SpeedIcon from '@mui/icons-material/Speed';
 import TrafficIcon from '@mui/icons-material/Traffic';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import Footer from '../components/Footer';
+
+interface TrafficData {
+  _id: string;
+  coordinates: string;
+  speed_mph: number;
+  street: string;
+  timestamp: string;
+}
+
+interface ApiResponse {
+  collection: string;
+  data: TrafficData[];
+}
 
 const Traffic: React.FC = () => {
   const [avgSpeed, setAvgSpeed] = useState("NA");
   const [busiestStreet, setBusiestStreet] = useState("NA");
   const [avgVehiclePerStreet, setAvgVehiclePerStreet] = useState("NA");
   const [metricsLoaded, setMetricsLoaded] = useState(false);
+  const [trafficData, setTrafficData] = useState<TrafficData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const BACKEND_URL = 'http://localhost:5002';
@@ -31,6 +47,25 @@ const Traffic: React.FC = () => {
 
     fetchRealtimeMetrics();
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost:5002/api/traffic?days=90&limit=100');
+        const data: ApiResponse = await response.json();
+        setTrafficData(data.data);
+        setError(null);
+      } catch {
+        setError('Failed to fetch traffic data');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleString();
 
   if (!metricsLoaded) {
     return (
@@ -105,14 +140,59 @@ const Traffic: React.FC = () => {
 
       <Box sx={{ maxWidth: 1400, mx: 'auto', mb: 4 }}>
         <Typography variant="h4" fontWeight={600} gutterBottom>
-          Live Congestion Data
+          Live Traffic Congestion Data
         </Typography>
         <Typography variant="body1" sx={{ mb: 2 }}>
-          Display MongoDB Data in a table format
+          Displaying Traffic MongoDB Data in tabular format
         </Typography>
-        <Box sx={{ width: '100%', height: 350, bgcolor: '#222', borderRadius: 4, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="caption" color="#aaa">[Placeholder]</Typography>
-        </Box>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Box sx={{ p: 2, bgcolor: 'error.main', borderRadius: 1 }}>
+            <Typography color="white">{error}</Typography>
+          </Box>
+        ) : (
+          <TableContainer component={Paper} sx={{ bgcolor: '#232323', color: 'white' }}>
+            <Table sx={{ minWidth: 650 }} aria-label="traffic table">
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ color: 'white' }}>Traffic ID</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Time</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Street</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Speed(mph)</TableCell>
+                  <TableCell sx={{ color: 'white' }}>Coordinates</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {trafficData.map((row) => (
+                  <TableRow key={row._id}>
+                    <TableCell sx={{ color: 'white' }}>{row._id}</TableCell>
+                    <TableCell sx={{ color: 'white' }}>{formatDate(row.timestamp)}</TableCell>
+                    <TableCell sx={{ color: 'white' }}>{row.street}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={typeof row.speed_mph === 'number' ? row.speed_mph.toFixed(2) : 'N/A'}
+                        color={
+                          row.speed_mph < 5
+                            ? 'error'
+                            : row.speed_mph < 20
+                            ? 'warning'
+                            : 'success'
+                        }
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell sx={{ color: 'white' }}>
+                      {row.coordinates}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
 
       <Box sx={{ maxWidth: 900, mx: 'auto', mb: 4, bgcolor: '#1976d2', color: 'white', borderRadius: 3, p: 3, textAlign: 'center' }}>
