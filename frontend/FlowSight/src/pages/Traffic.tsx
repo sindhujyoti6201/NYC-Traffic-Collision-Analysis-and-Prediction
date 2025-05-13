@@ -1,14 +1,44 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent, Button, CardHeader } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Card, CardContent, Button, CardHeader, CircularProgress } from '@mui/material';
 import SpeedIcon from '@mui/icons-material/Speed';
 import TrafficIcon from '@mui/icons-material/Traffic';
 import TimelineIcon from '@mui/icons-material/Timeline';
 import Footer from '../components/Footer';
 
 const Traffic: React.FC = () => {
-  const avgSpeed = 32;
-  const busiestStreet = "123 Broadway";
-  const avgVehiclePerStreet = 18;
+  const [avgSpeed, setAvgSpeed] = useState("NA");
+  const [busiestStreet, setBusiestStreet] = useState("NA");
+  const [avgVehiclePerStreet, setAvgVehiclePerStreet] = useState("NA");
+  const [metricsLoaded, setMetricsLoaded] = useState(false);
+
+  useEffect(() => {
+    const BACKEND_URL = 'http://localhost:5002';
+    const fetchRealtimeMetrics = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/realtime-traffic-metrics`);
+        const data = await response.json();
+        if (data.status === 'success') {
+          setAvgSpeed(data.avgSpeed);
+          setBusiestStreet(data.busiestStreet);
+          setAvgVehiclePerStreet(data.avgVehiclesPerStreet);
+        }
+      } catch (error) {
+        console.error('Error fetching realtime metrics:', error);
+      } finally {
+        setMetricsLoaded(true);
+      }
+    };
+
+    fetchRealtimeMetrics();
+  }, []);
+
+  if (!metricsLoaded) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#181818' }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#181818' }}>
@@ -33,25 +63,38 @@ const Traffic: React.FC = () => {
         </Typography>
       </Box>
 
+      {/* Equal height cards */}
       <Box display="flex" flexWrap="wrap" justifyContent="center" gap={3} sx={{ mb: 4 }}>
         <Box flex="1 1 220px" minWidth={220} maxWidth={300}>
-          <Card sx={{ bgcolor: '#232323', color: 'white', height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Card sx={{ bgcolor: '#232323', color: 'white', height: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardHeader avatar={<SpeedIcon color="primary" />} title="Average City-wide Speed" />
             <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <Typography variant="h4">{avgSpeed} mph</Typography>
             </CardContent>
           </Card>
         </Box>
+
         <Box flex="1 1 220px" minWidth={220} maxWidth={300}>
-          <Card sx={{ bgcolor: '#232323', color: 'white', height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Card sx={{ bgcolor: '#232323', color: 'white', height: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardHeader avatar={<TrafficIcon color="error" />} title="Busiest Street" />
             <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <Typography variant="h6">{busiestStreet}</Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  maxHeight: 80,
+                  overflowY: 'auto',
+                  wordWrap: 'break-word',
+                  textAlign: 'center'
+                }}
+              >
+                {busiestStreet}
+              </Typography>
             </CardContent>
           </Card>
         </Box>
+
         <Box flex="1 1 220px" minWidth={220} maxWidth={300}>
-          <Card sx={{ bgcolor: '#232323', color: 'white', height: 160, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Card sx={{ bgcolor: '#232323', color: 'white', height: 200, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <CardHeader avatar={<TimelineIcon color="secondary" />} title="Average vehicle per street" />
             <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
               <Typography variant="h4">{avgVehiclePerStreet}</Typography>
@@ -85,4 +128,4 @@ const Traffic: React.FC = () => {
   );
 };
 
-export default Traffic; 
+export default Traffic;

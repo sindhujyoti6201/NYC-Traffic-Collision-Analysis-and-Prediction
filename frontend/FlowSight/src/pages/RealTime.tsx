@@ -1,14 +1,46 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent, CardHeader, Button } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Card, CardContent, CardHeader, Button, CircularProgress } from '@mui/material';
 import SpeedIcon from '@mui/icons-material/Speed';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import AltRouteIcon from '@mui/icons-material/AltRoute';
 import Footer from '../components/Footer';
 
 const RealTime: React.FC = () => {
-  const avgSpeed = 35;
-  const activeIncidents = 20;
-  const mostCongested = 'Broadway Manhattan';
+  const [avgSpeed, setAvgSpeed] = useState(35);
+  const [activeIncidents, setActiveIncidents] = useState(20);
+  const [mostCongested, setMostCongested] = useState('Broadway Manhattan');
+  const [metricsLoaded, setMetricsLoaded] = useState(false);
+  const BACKEND_URL = 'http://localhost:5002';
+
+  useEffect(() => {
+    const fetchRealtimeMetrics = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/realtime-traffic-metrics`);
+        const data = await response.json();
+        console.log('Response:', data);
+        if (data.status === 'success') {
+          console.log('Fetched Realtime Metrics:', data);
+          setAvgSpeed(data.avgSpeed);
+          setActiveIncidents(data.activeIncidents);
+          setMostCongested(data.mostCongested);
+        }
+      } catch (error) {
+        console.error('Error fetching realtime metrics:', error);
+      } finally {
+        setMetricsLoaded(true);
+      }
+    };
+
+    fetchRealtimeMetrics();
+  }, []);
+
+  if (!metricsLoaded) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#181818' }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#181818' }}>
@@ -91,7 +123,7 @@ const RealTime: React.FC = () => {
             size="large"
           >
           Live NYC Traffic Map
-          </Button>
+        </Button>
       </Box>
 
       <Box sx={{ maxWidth: 900, mx: 'auto', mb: 4, bgcolor: '#1976d2', color: 'white', borderRadius: 3, p: 3, textAlign: 'center' }}>
@@ -110,4 +142,4 @@ const RealTime: React.FC = () => {
   );
 };
 
-export default RealTime; 
+export default RealTime;
