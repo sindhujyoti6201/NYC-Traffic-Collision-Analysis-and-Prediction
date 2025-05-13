@@ -1,44 +1,67 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from pymongo import MongoClient
-from pyspark.sql import SparkSession
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
 # MongoDB settings
 MONGO_URI = "mongodb://mongodb:27017/"
 DB_NAME = "streamingDB"
-COLLECTION_NAME = "collisions_ts"
 
 # Initialize MongoDB client
 mongo_client = MongoClient(MONGO_URI)
 db = mongo_client[DB_NAME]
 
-# Initialize Spark session with Mongo connector
-spark = SparkSession.builder \
-    .appName("MongoDB-Spark-App") \
-    .config("spark.jars", "/app/jars/mongo-spark-connector_2.12-10.3.0.jar") \
-    .config("spark.mongodb.read.connection.uri", f"{MONGO_URI}{DB_NAME}.{COLLECTION_NAME}") \
-    .getOrCreate()
-
 @app.route("/")
 def home():
-    return jsonify({"status": "server running", "info": "Use /analyze to trigger Spark job"})
+    return jsonify({
+        "status": "server running",
+        "info": "Use /api/collisions or /api/traffic with optional ?days=N&limit=M query parameters"
+    })
 
-@app.route("/analyze")
-def analyze_data():
+def get_recent_data(collection_name, days=5, limit=2000):
     try:
-        # Read Mongo data into Spark DataFrame
-        df = spark.read.format("mongo").load()
-        count = df.count()
-        schema = df.schema.json()
+        app.logger.info(f"Fetching data from collection: {collection_name}")
+        collection = db[collection_name]
+        now = datetime.utcnow()
+        start_time = (now - timedelta(days=days)).replace(microsecond=0).isoformat()
+        app.logger.info(f"Fetching records from {start_time} to {now.isoformat()}")
 
-        return jsonify({
+        results = list(
+            collection.find({"timestamp": {"$gte": start_time}})
+                      .sort("timestamp", -1)
+                      .limit(limit)
+        )
+
+        app.logger.info(f"Found {len(results)} records")
+        # Clean ObjectId for JSON serialization
+        for doc in results:
+            doc["_id"] = str(doc["_id"])
+
+        return {
             "status": "success",
-            "records_in_mongo": count,
-            "schema": schema
-        })
+            "collection": collection_name,
+            "records_found": len(results),
+            "data": results
+        }
     except Exception as e:
-        return jsonify({"status": "error", "message": str(e)}), 500
+        return {
+            "status": "error",
+            "collection": collection_name,
+            "message": str(e)
+        }
+
+@app.route("/api/collisions", methods=["GET"])
+def api_recent_collisions():
+    days = int(request.args.get("days", 5))
+    limit = int(request.args.get("limit", 2000))
+    return jsonify(get_recent_data("collisions_ts", days=days, limit=limit))
+
+@app.route("/api/traffic", methods=["GET"])
+def api_recent_traffic():
+    days = int(request.args.get("days", 5))
+    limit = int(request.args.get("limit", 2000))
+    return jsonify(get_recent_data("traffic_speeds", days=days, limit=limit))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)
