@@ -1,14 +1,44 @@
-import React from 'react';
-import { Box, Typography, Card, CardContent, Button, Tooltip } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Card, CardContent, Button, Tooltip, CircularProgress } from '@mui/material';
 import ReportIcon from '@mui/icons-material/Report';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import Footer from '../components/Footer';
 
 const Collision: React.FC = () => {
-  const collisions = 20;
-  const injuriesLastHour = 10;
-  const mostImpactedBorough = "Brooklyn";
+  const [collisions, setCollisions] = useState(20);
+  const [injuriesLastHour, setInjuriesLastHour] = useState("NA");
+  const [mostImpactedBorough, setMostImpactedBorough] = useState("NA");
+  const [metricsLoaded, setMetricsLoaded] = useState(false);
+
+  useEffect(() => {
+    const BACKEND_URL = 'http://localhost:5002';
+    const fetchRealtimeCollisions = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/api/realtime-collision-metrics`);
+        const data = await response.json();
+        if (data.status === 'success') {
+          setCollisions(data.collisions);
+          setInjuriesLastHour(data.totalInjuries);
+          setMostImpactedBorough(data.mostImpactedBorough);
+        }
+      } catch (error) {
+        console.error('Error fetching collision metrics:', error);
+      } finally {
+        setMetricsLoaded(true);
+      }
+    };
+
+    fetchRealtimeCollisions();
+  }, []);
+
+  if (!metricsLoaded) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#181818' }}>
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ minHeight: '100vh', background: '#181818' }}>
@@ -68,7 +98,7 @@ const Collision: React.FC = () => {
           </Tooltip>
         </Box>
         <Box flex="1 1 220px" minWidth={220} maxWidth={300}>
-          <Tooltip title="Borough with highest collision count (24h).">
+          <Tooltip title="Borough with highest collision count (60 min).">
             <Card sx={{ bgcolor: '#232323', color: 'white', height: 140, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
               <CardContent>
                 <LocationCityIcon color="secondary" sx={{ fontSize: 32 }} />
@@ -108,4 +138,4 @@ const Collision: React.FC = () => {
   );
 };
 
-export default Collision; 
+export default Collision;
