@@ -10,4 +10,4 @@ wheels/
 .venv
 
 .python-version
-FlowSight/node_modules/
+frontend/FlowSight/node_modules
