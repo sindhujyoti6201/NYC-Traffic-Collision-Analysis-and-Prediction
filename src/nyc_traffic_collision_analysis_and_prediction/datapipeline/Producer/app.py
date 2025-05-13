@@ -31,7 +31,7 @@ API_MAX = 50000
 COL_WM_FILE = root / "last_ingested_collisions.txt"
 SPD_WM_FILE = root / "last_ingested_speeds.txt"
 
-def read_wm(path, default="2024-01-01T00:00:00"):
+def read_wm(path, default="2025-01-01T00:00:00"):
     if path.is_file():
         return path.read_text().strip()
     return default
