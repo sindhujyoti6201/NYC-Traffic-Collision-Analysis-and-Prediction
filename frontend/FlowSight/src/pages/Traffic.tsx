@@ -175,9 +175,9 @@ const Traffic: React.FC = () => {
                       <Chip
                         label={typeof row.speed_mph === 'number' ? row.speed_mph.toFixed(2) : 'N/A'}
                         color={
-                          row.speed_mph < 5
+                          row.speed_mph > 35
                             ? 'error'
-                            : row.speed_mph < 20
+                            : row.speed_mph > 20
                             ? 'warning'
                             : 'success'
                         }
