@@ -28,6 +28,39 @@
       display: block;
       margin: auto;
     }
+    /* Dark controls style for black background */
+    #controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 20px;
+        background-color: #2c2c2c;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        margin: 30px auto;
+        max-width: 500px;           /* 👈 limits the width */
+        width: 90%;                 /* 👈 responsive on small screens */
+    }
+
+    #controls label {
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 0;
+        font-size: 16px;
+    }
+
+    #controls input[type="date"] {
+        background-color: #181818;
+        color: #ffffff;
+        border: 1px solid #555;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        width: 180px;               /* 👈 consistent size */
+    }
+
+
   </style>
 </head>
 <body>
