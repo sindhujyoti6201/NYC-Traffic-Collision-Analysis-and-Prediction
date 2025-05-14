@@ -1,0 +1,50 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NYC Traffic Speeds</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
+    }
+    #controls {
+      margin-bottom: 10px;
+    }
+    .tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+    svg {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <label for="datePicker">Choose day: </label>
+    <input id="datePicker"
+           type="date"
+           min="2024-01-01"
+           max="2024-12-31"
+           value="2024-04-03" />
+  </div>
+  <div id="vis"></div>
+  <div id="tooltip" class="tooltip"></div>
+
+  <!-- D3 -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <!-- Your code -->
+  <script src="script.js"></script>
+</body>
+</html>
