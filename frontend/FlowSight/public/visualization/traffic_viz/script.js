@@ -3,15 +3,10 @@
   // 1. Load data
   const [traffic_json, zipGeo] = await Promise.all([
     fetch(`http://localhost:5002/api/traffic?days=450&limit=35000`).then(
-      res => res.json())
-      .then(data => {
-      console.log("Fetched traffic data:", data);
-      return data;
-    }),
-    fetch("nyc-zip-code-tabulation-areas-polygons.geojson").then(r => r.json())
+      res => res.json()),
+    fetch("../nyc-zip-code-tabulation-areas-polygons.geojson").then(r => r.json())
   ]);
 
-  // console.log(traffic)
   const traffic = traffic_json.data
 
   // 2. Helpers
