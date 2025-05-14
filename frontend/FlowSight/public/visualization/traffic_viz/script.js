@@ -1,6 +1,6 @@
 // script.js
 (async function() {
-  const zipGeo = await fetch("nyc-zip-code-tabulation-areas-polygons.geojson").then(r => r.json());
+  const zipGeo = await fetch("../nyc-zip-code-tabulation-areas-polygons.geojson").then(r => r.json());
 
   const parsePolyline = d =>
     d.coordinates.trim().split(" ").map(pt => {
