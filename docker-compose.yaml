@@ -84,6 +84,8 @@ services:
       - "5002:5002"
     depends_on:
       - mongodb
+    env_file:
+      - .env
     restart: unless-stopped
 
 

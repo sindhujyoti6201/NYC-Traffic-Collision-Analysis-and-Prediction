@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 from flask_cors import CORS
+from inference_model import get_predictions
+from bson import ObjectId
 
 app = Flask(__name__)
 CORS(app)
@@ -158,6 +160,31 @@ def api_recent_traffic():
     days = int(request.args.get("days", 5))
     limit = int(request.args.get("limit", 2000))
     return jsonify(get_recent_data("traffic_speeds", days=days, limit=limit))
+
+def convert_objectid(obj):
+    if isinstance(obj, ObjectId):
+        return str(obj)
+    return obj
+
+@app.route("/api/predictions", methods=["GET"])
+def api_predictions():
+    try:
+        days = int(request.args.get("days", 7))
+        limit = int(request.args.get("limit", 5000))
+        predictions = get_predictions(days=days, limit=limit)
+
+        # 🔥 FIX: convert all ObjectId fields
+        for doc in predictions:
+            if "_id" in doc:
+                doc["_id"] = str(doc["_id"])
+
+        return jsonify({
+            "status": "success",
+            "records_found": len(predictions),
+            "data": predictions
+        })
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5002, debug=True)

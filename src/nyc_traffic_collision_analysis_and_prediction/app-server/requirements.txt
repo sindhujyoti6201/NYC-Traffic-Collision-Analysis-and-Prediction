@@ -1,4 +1,10 @@
+numpy
 flask
 pymongo
 pyspark
 flask-cors
+pandas
+huggingface_hub
+joblib
+python-dotenv
+scikit-learn
