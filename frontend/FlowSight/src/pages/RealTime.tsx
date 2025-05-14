@@ -15,7 +15,7 @@ const RealTime: React.FC = () => {
   useEffect(() => {
     const fetchRealtimeMetrics = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/api/realtime-metrics`);
+        const response = await fetch(`${BACKEND_URL}/api/realtime-traffic-metrics`);
         const data = await response.json();
         console.log('Response:', data);
         if (data.status === 'success') {
