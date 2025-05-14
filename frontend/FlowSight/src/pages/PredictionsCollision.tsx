@@ -32,17 +32,17 @@ const PredictionsCollision = () => {
 
       {/* Collision Visualization */}
       <Box sx={{ maxWidth: 1400, mx: 'auto', mb: 4 }}>
-        <Typography variant="h4" fontWeight={600} gutterBottom>
+        <Typography variant="h4" fontWeight={600} gutterBottom sx={{ color: 'white', mt: 2 }}>
           Collision Visualization
         </Typography>
-        <Typography variant="body1" sx={{ mb: 2 }}>
+        <Typography variant="body1" sx={{ mb: 2, color: '#ccc' }}>
           Visualization of data from the collision prediction model.
         </Typography>
-        <Box sx={{ width: '100%', height: 500, borderRadius: 4, mb: 2, overflow: 'hidden' }}>
+        <Box sx={{ width: '100%', height: '110vh', borderRadius: 4, mb: 2, overflow: 'hidden' }}>
           <iframe
             src="http://localhost:5173/visualization/collision_viz/index.html"
             style={{ width: '100%', height: '100%', border: 'none' }}
-            title="Traffic Visualization"
+            title="Collision Visualization"
           />
         </Box>
       </Box>

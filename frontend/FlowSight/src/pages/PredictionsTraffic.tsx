@@ -35,15 +35,14 @@ const PredictionsTraffic = () => {
         <Typography variant="body1" sx={{ mb: 2 }}>
           Understand the predicted traffic flow and congestion levels across the city by visualizing the forecasted data.
         </Typography>
-        <Box sx={{ width: '100%', height: 500, borderRadius: 4, mb: 2, overflow: 'hidden' }}>
-          <iframe
-            src="http://localhost:5173/visualization/traffic_viz/index.html"
-            style={{ width: '100%', height: '100%', border: 'none' }}
-            title="Traffic Visualization"
-          />
-        </Box>
+        <Box sx={{ width: '100%', height: '110vh', borderRadius: 4, mb: 2, overflow: 'hidden' }}>
+                <iframe
+                  src="http://localhost:5173/visualization/traffic_viz/index.html"
+                  style={{ width: '100%', height: '100%', border: 'none' }}
+                  title="Collision Visualization"
+                />
+              </Box>
       </Box>
-
       <Footer />
     </Box>
   );

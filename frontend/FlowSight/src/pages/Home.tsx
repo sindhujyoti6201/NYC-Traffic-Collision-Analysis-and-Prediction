@@ -278,7 +278,7 @@ const Home: React.FC = () => {
             align="center"
             sx={{ color: '#fff', mb: 4, textShadow: '0 2px 8px #0008' }}
           >
-            Visualizations
+            Sample Visualizations
           </Typography>
           <Box display="flex" flexWrap="wrap" gap={3} justifyContent="center">
             <Box flex="1 1 300px" minWidth={300} maxWidth={600}>
