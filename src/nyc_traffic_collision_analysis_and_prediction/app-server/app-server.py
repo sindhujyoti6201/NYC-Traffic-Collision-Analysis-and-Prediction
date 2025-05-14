@@ -25,14 +25,23 @@ def get_recent_data(collection_name, days=5, limit=2000):
     try:
         app.logger.info(f"Fetching data from collection: {collection_name}")
         collection = db[collection_name]
-        now = datetime.utcnow()
-        start_time = (now - timedelta(days=days)).replace(microsecond=0).isoformat()
-        app.logger.info(f"Fetching records from {start_time} to {now.isoformat()}")
+
+        # Create start and end of day in UTC
+        date_start = datetime.utcnow() - timedelta(days=days)
+        date_start = datetime(date_start.year, date_start.month, date_start.day)  # start of day
+        date_end = date_start + timedelta(days=1)  # next day's start time (exclusive)
+
+        app.logger.info(f"Fetching records between {date_start.isoformat()} and {date_end.isoformat()}")
 
         results = list(
-            collection.find({"timestamp": {"$gte": start_time}})
-                      .sort("timestamp", -1)
-                      .limit(limit)
+            collection.find({
+                "timestamp": {
+                    "$gte": date_start.isoformat(),
+                    "$lt": date_end.isoformat()
+                }
+            })
+            .sort("timestamp", -1)
+            .limit(limit)
         )
 
         app.logger.info(f"Found {len(results)} records")

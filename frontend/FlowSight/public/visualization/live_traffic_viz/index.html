@@ -33,18 +33,33 @@
 <body>
   <div id="controls">
     <label for="datePicker">Choose day: </label>
-    <input id="datePicker"
-           type="date"
-           min="2024-01-01"
-           max="2024-12-31"
-           value="2024-04-03" />
+    <input id="datePicker" type="date" min="2025-01-01">
   </div>
+
   <div id="vis"></div>
   <div id="tooltip" class="tooltip"></div>
 
   <!-- D3 -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <!-- Your code -->
+
+  <!-- Set max date and value dynamically -->
+  <script>
+    const dp = document.getElementById("datePicker");
+    const today = new Date();
+    if (today.getFullYear() === 2025) {
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const currentDate = `${yyyy}-${mm}-${dd}`;
+      dp.max = currentDate;
+      dp.value = currentDate;
+    } else {
+      dp.max = '2025-12-31';
+      dp.value = '2025-01-01';
+    }
+  </script>
+
+  <!-- App code -->
   <script src="script.js"></script>
 </body>
 </html>

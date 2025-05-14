@@ -19,7 +19,7 @@ const team = [
     photo: '/src/assets/pnv.PNG',
   },
   {
-    name: 'Sindhu Dutta',
+    name: 'Sindhujyoti Dutta',
     email: 'sd6201@nyu.edu',
     photo: '/src/assets/sid.PNG',
   },
@@ -58,7 +58,7 @@ const About: React.FC = () => (
           About Our Project
         </Typography>
         <Typography variant="h5" fontWeight={500} sx={{ mb: 4, textShadow: '0 2px 8px #000, 0 0 2px #000', px: 2 }}>
-          Our Team
+          Team Members
         </Typography>
       </Box>
     </Box>
