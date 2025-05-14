@@ -28,23 +28,71 @@
       display: block;
       margin: auto;
     }
+    /* Dark controls style for black background */
+
+    #controls {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 20px;
+        background-color: #2c2c2c;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+        margin: 30px auto;
+        max-width: 500px;           /* 👈 limits the width */
+        width: 90%;                 /* 👈 responsive on small screens */
+    }
+
+    #controls label {
+        font-weight: 500;
+        color: #ffffff;
+        margin-bottom: 0;
+        font-size: 16px;
+    }
+
+    #controls input[type="date"] {
+        background-color: #181818;
+        color: #ffffff;
+        border: 1px solid #555;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+        width: 180px;               /* 👈 consistent size */
+    }
+
   </style>
 </head>
 <body>
   <div id="controls">
     <label for="datePicker">Choose day: </label>
-    <input id="datePicker"
-           type="date"
-           min="2024-01-01"
-           max="2024-12-31"
-           value="2024-04-03" />
+    <input id="datePicker" type="date" min="2025-01-01">
   </div>
+
   <div id="vis"></div>
   <div id="tooltip" class="tooltip"></div>
 
   <!-- D3 -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
-  <!-- Your code -->
+
+  <!-- Set max date and value dynamically -->
+  <script>
+    const dp = document.getElementById("datePicker");
+    const today = new Date();
+    if (today.getFullYear() === 2025) {
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+      const currentDate = `${yyyy}-${mm}-${dd}`;
+      dp.max = currentDate;
+      dp.value = currentDate;
+    } else {
+      dp.max = '2025-12-31';
+      dp.value = '2025-01-01';
+    }
+  </script>
+
+  <!-- App code -->
   <script src="script.js"></script>
 </body>
 </html>

@@ -14,7 +14,6 @@ ENV PYSPARK_PYTHON=python3
 WORKDIR /app
 
 # Install Python dependencies
-COPY jars/* /app/jars/
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 

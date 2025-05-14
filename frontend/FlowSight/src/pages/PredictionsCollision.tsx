@@ -87,8 +87,12 @@ const PredictionsCollision: React.FC = () => {
         <Typography variant="body1" sx={{ mb: 2 }}>
           Visualization of data from the collision prediction model.
         </Typography>
-        <Box sx={{ width: '100%', height: 350, bgcolor: '#222', borderRadius: 4, mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Typography variant="caption" color="#aaa">[Visualization placeholder]</Typography>
+        <Box sx={{ width: '100%', height: 500, borderRadius: 4, mb: 2, overflow: 'hidden' }}>
+          <iframe
+            src="http://localhost:5173/visualization/collision_viz/index.html"
+            style={{ width: '100%', height: '100%', border: 'none' }}
+            title="Traffic Visualization"
+          />
         </Box>
       </Box>
       <Box sx={{ maxWidth: 900, mx: 'auto', mb: 2, textAlign: 'center' }}>
