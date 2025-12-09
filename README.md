@@ -553,6 +553,9 @@ docker-compose logs spark-flask-app
 ## 👥 Authors
 
 - Sindhujyoti Dutta (sd6201@nyu.edu)
+- Ojas Gramopadhye (og2186@nyu.edu)
+- Pranav Raj N K (pn2330@nyu.edu)
+- Omkar Waikar (ow2130)
 
 ---
 
